@@ -241,9 +241,17 @@ public:
 	LRESULT OnSuspendThreadInject(UINT, int, HWND)
 	{
 		// TODO:  在此添加控件通知处理程序代码
-		_TCHAR ImeDllPath[MAX_PATH] = _T("E:\\InjectDll\\InjectImeDll.dll");
-		_TCHAR InjectDllPath[MAX_PATH] = _T("E:\\InjectDll\\InjectHelper.dll");
+		_TCHAR ImeDllPath[MAX_PATH] = { 0 };
+		_TCHAR InjectDllPath[MAX_PATH] = { 0 };
 
+#ifdef _WIN64
+		_sntprintf(ImeDllPath, sizeof(ImeDllPath) / sizeof(_TCHAR), _T("%sInjectImeDllX64.dll"), GetProgramPath().c_str());
+		_sntprintf(InjectDllPath, sizeof(InjectDllPath) / sizeof(_TCHAR), _T("%sInjectHelperX64.dll"), GetProgramPath().c_str());
+#else
+		_sntprintf(ImeDllPath, sizeof(ImeDllPath) / sizeof(_TCHAR), _T("%sInjectImeDll.dll"), GetProgramPath().c_str());
+		_sntprintf(InjectDllPath, sizeof(InjectDllPath) / sizeof(_TCHAR), _T("%sInjectHelper.dll"), GetProgramPath().c_str());
+#endif
+		
 		//原始输入法
 		HKL HklOldInput = NULL;
 		//新的输入法
@@ -272,12 +280,13 @@ public:
 
 		//1.保存原始的键盘布局，方便后面还原
 		SystemParametersInfo(SPI_GETDEFAULTINPUTLANG, 0, &HklOldInput, 0);
+
 		//2.将输入法DLL和待注入Dll一起放到C:\\WINDOWS\\SYSTEM32目录下
-		CopyFile(ImeDllPath, _T("C:\\WINDOWS\\SYSTEM32\\InjectImeDll.ime"), FALSE);
-		CopyFile(strAppDll, _T("C:\\WINDOWS\\SYSTEM32\\InjectHelper.dll"), FALSE);
+		CopyFile(ImeDllPath, tstring(GetSystemPath() + _T("InjectImeDll.ime")).c_str(), FALSE);
+		CopyFile(strAppDll, tstring(GetSystemPath() + _T("InjectHelper.dll")).c_str(), FALSE);
 
 		//3.加载输入法
-		HklNewInput = ImmInstallIME(_T("C:\\WINDOWS\\SYSTEM32\\InjectImeDll.ime"), _T("我的输入法"));
+		HklNewInput = ImmInstallIME(tstring(GetSystemPath() + _T("InjectImeDll.ime")).c_str(), _T("我的输入法"));
 
 		//4.判断输入法句柄是否有效
 		if (!ImmIsIME(HklNewInput))
@@ -344,7 +353,7 @@ public:
 		}
 
 		// 删除输入法文件
-		DeleteFile(_T("C:\\WINDOWS\\SYSTEM32\\MyImeDll.ime"));
+		DeleteFile(tstring(GetSystemPath() + _T("InjectImeDll.ime")).c_str());
 
 		return 0;
 	}

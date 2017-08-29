@@ -4,9 +4,9 @@
 BOOL LoadFileR(LPCTSTR lpFilename,PMAP_FILE_STRUCT pstMapFile)
 {
 
-	HANDLE hFile;
-	HANDLE hMapping;
-	LPVOID ImageBase;
+	HANDLE hFile = NULL;
+	HANDLE hMapping = NULL;
+	LPVOID ImageBase = NULL;
 
 	memset(pstMapFile,0,sizeof(MAP_FILE_STRUCT));
 
@@ -81,8 +81,8 @@ PIMAGE_NT_HEADERS  GetNtHeaders(LPVOID ImageBase)
     
 	if(!IsPEFile(ImageBase))
 		return NULL;
-	PIMAGE_NT_HEADERS  pNtH;
-	PIMAGE_DOS_HEADER  pDH;
+	PIMAGE_NT_HEADERS  pNtH = NULL;
+	PIMAGE_DOS_HEADER  pDH = NULL;
 	pDH=(PIMAGE_DOS_HEADER)ImageBase;
 	pNtH=(PIMAGE_NT_HEADERS)((DWORD)pDH+pDH->e_lfanew);
 
@@ -135,7 +135,7 @@ LPVOID MyRvaToPtr(PIMAGE_NT_HEADERS pNtH,void* ImageBase,unsigned long dwRVA)
 
 LPVOID GetDirectoryEntryToData(LPVOID ImageBase,USHORT DirectoryEntry)
 {
-	DWORD dwDataStartRVA;
+	DWORD dwDataStartRVA = 0;
 	LPVOID pDirData=NULL;
 	PIMAGE_NT_HEADERS     pNtH=NULL;
 	PIMAGE_OPTIONAL_HEADER pOH=NULL;
@@ -159,7 +159,7 @@ LPVOID GetDirectoryEntryToData(LPVOID ImageBase,USHORT DirectoryEntry)
 
 DWORD GetDirectorySize(LPVOID ImageBase, USHORT DirectoryEntry)
 {
-	DWORD dwSize;
+	DWORD dwSize = 0;
 	LPVOID pDirData = NULL;
 	PIMAGE_NT_HEADERS     pNtH = NULL;
 	PIMAGE_OPTIONAL_HEADER pOH = NULL;
@@ -186,7 +186,7 @@ PIMAGE_EXPORT_DIRECTORY  GetExportDirectory(LPVOID ImageBase)
 
 PIMAGE_BASE_RELOCATION GetFirstRelocation(LPVOID ImageBase)
 {
-	PIMAGE_BASE_RELOCATION pImageBase;
+	PIMAGE_BASE_RELOCATION pImageBase = NULL;
 	pImageBase = (PIMAGE_BASE_RELOCATION)GetDirectoryEntryToData(ImageBase, IMAGE_DIRECTORY_ENTRY_BASERELOC);
 
 	if (!pImageBase)
@@ -199,8 +199,7 @@ PIMAGE_BASE_RELOCATION GetFirstRelocation(LPVOID ImageBase)
 
 PIMAGE_BASE_RELOCATION GetNextRelocation(int nSum, LPVOID ImageBase)
 {
-	PIMAGE_BASE_RELOCATION pTempImageBase;
-	PIMAGE_BASE_RELOCATION pImageBase;
+	PIMAGE_BASE_RELOCATION pImageBase = NULL;
 	DWORD dwNewAddr = NULL;
 	dwNewAddr = (DWORD)GetDirectoryEntryToData(ImageBase, IMAGE_DIRECTORY_ENTRY_BASERELOC);
 
@@ -215,7 +214,7 @@ PIMAGE_BASE_RELOCATION GetNextRelocation(int nSum, LPVOID ImageBase)
 
 PIMAGE_RESOURCE_DIRECTORY GetFirstResDirectory(LPVOID ImageBase)
 {
-	PIMAGE_RESOURCE_DIRECTORY pImageBase;
+	PIMAGE_RESOURCE_DIRECTORY pImageBase = NULL;
 	pImageBase = (PIMAGE_RESOURCE_DIRECTORY)GetDirectoryEntryToData(ImageBase, IMAGE_DIRECTORY_ENTRY_RESOURCE);
 
 	if (!pImageBase)
