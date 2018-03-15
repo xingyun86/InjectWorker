@@ -30,6 +30,7 @@ Exit0:
 
 BOOL ApcInject(DWORD dwPid, CHAR *pszDllPath)
 {
+	FILE * pFile = NULL;
 	HANDLE hProcess = NULL;
 	BOOL bRet = FALSE;
 	HANDLE hSnapshot = NULL;
@@ -57,6 +58,7 @@ BOOL ApcInject(DWORD dwPid, CHAR *pszDllPath)
 
 	te32.dwSize = sizeof(THREADENTRY32);
 	bRet = Thread32First(hSnapshot, &te32);
+	pFile = fopen("D:\\inject_action.log", "wb");
 	while (bRet)
 	{
 		if (te32.th32OwnerProcessID == dwPid)
@@ -66,6 +68,7 @@ BOOL ApcInject(DWORD dwPid, CHAR *pszDllPath)
 			{
 				dwResult = QueueUserAPC((PAPCFUNC)LoadLibraryA, hThread, (ULONG_PTR)lpDllName);
 				printf("%lu-0x%X--\n", dwResult, GetLastError());
+				fprintf(pFile, "%lu-0x%X--\r\n", dwResult, GetLastError());
 				CloseHandle(hThread);
 			}
 		}
@@ -74,6 +77,10 @@ BOOL ApcInject(DWORD dwPid, CHAR *pszDllPath)
 	}
 
 Exit0:
+	if (pFile)
+	{
+		fclose(pFile);
+	}
 	// VirtualFreeEx
 	CloseHandle(hSnapshot);
 	CloseHandle(hProcess);

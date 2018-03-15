@@ -16,6 +16,9 @@
 
 
 // TODO: reference additional headers your program requires here
+
+#define PLUGIN_LDR_NAME L"\\test.dll"
+
 //获取程序文件路径
 static __inline std::string GetProgramPath(HINSTANCE hInstance = NULL)
 {

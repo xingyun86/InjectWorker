@@ -23,7 +23,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 		//ILog4zManager::getInstance()->start();
 
 		InitDebugConsole();
-		DebugPrintString(_T("Enter DLL_PROCESS_ATTACH!"));
+		DebugPrintString(_T("Enter DLL_PROCESS_ATTACH!\r\n"));
 		itSSVVM = G_SSVVM.begin();
 		itSSVVMEnd = G_SSVVM.end();
 		for (; itSSVVM != itSSVVMEnd; itSSVVM++)
@@ -54,7 +54,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 	break;
 	case DLL_PROCESS_DETACH:
 	{
-		DebugPrintString(_T("Enter DLL_PROCESS_DETACH!"));
+		DebugPrintString(_T("Enter DLL_PROCESS_DETACH!\r\n"));
 		itSSVVM = G_SSVVM.begin();
 		itSSVVMEnd = G_SSVVM.end();
 		for (; itSSVVM != itSSVVMEnd; itSSVVM++)

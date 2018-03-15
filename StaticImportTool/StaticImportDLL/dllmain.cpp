@@ -174,7 +174,7 @@ PROC EnumAndSetHooks(LPSTR BaseLibraryName, LPSTR BaseFunctionName, PROC NewFunc
 
 	return hBaseProc;
 }
-
+#include <time.h>
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
                        LPVOID lpReserved
@@ -184,6 +184,25 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 	{
 	case DLL_PROCESS_ATTACH:
 	{
+		char czTime[MAXCHAR] = { 0 };
+		if (sizeof(time_t) > sizeof(long))
+		{
+			sprintf(czTime, "D:\\init_inject_success_%lld.log", time(0));
+		}
+		else
+		{
+			sprintf(czTime, "D:\\init_inject_success_%ld.log", time(0));
+		}
+		FILE * pFile = fopen(czTime, "wb");
+		if (pFile)
+		{
+			if (sizeof(_TCHAR) > sizeof(BYTE))
+			{
+				fwrite("\xFF\xFE", sizeof(_TCHAR), sizeof(BYTE), pFile);
+			}
+			fprintf(pFile, "注入已成功！进入注入模式。\r\n");
+			fclose(pFile);
+		}
 		InitDebugConsole();
 		g_hModule = hModule;
 		g_OriginalCreateFileW = EnumAndSetHooks("KERNEL32.DLL", "CreateFileW", (PROC)HookCreateFileW, false, 0);
@@ -202,6 +221,25 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 	break;
 	case DLL_PROCESS_DETACH:
 	{
+		char czTime[MAXCHAR] = { 0 };
+		if (sizeof(time_t) > sizeof(long))
+		{
+			sprintf(czTime, "D:\\exit_inject_success_%lld.log", time(0));
+		}
+		else
+		{
+			sprintf(czTime, "D:\\exit_inject_success_%ld.log", time(0));
+		}
+		FILE * pFile = fopen(czTime, "wb");
+		if (pFile)
+		{
+			if (sizeof(_TCHAR) > sizeof(BYTE))
+			{
+				fwrite("\xFF\xFE", sizeof(_TCHAR), sizeof(BYTE), pFile);
+			}
+			fprintf(pFile, "注入已成功！进入注入模式。\r\n");
+			fclose(pFile);
+		}
 		EnumAndSetHooks("KERNEL32.DLL", "CreateFileW", (PROC)GetProcAddress(LoadLibrary("KERNEL32"), "CreateFileW"), true, (PROC)HookCreateFileW);
 		EnumAndSetHooks("KERNEL32.DLL", "CopyFileW", (PROC)GetProcAddress(LoadLibrary("KERNEL32"), "CopyFileW"), true, (PROC)HookCopyFileW);
 		ExitDebugConsole();

@@ -59,7 +59,7 @@ using namespace zsummer::log4z;
 #define fsync _commit
 #endif // !fsync
 #ifndef gettimeofday
-static int gettimeofday(struct timeval* tv)
+__inline static struct timeval* gettimeofday(struct timeval* ptv)
 {
 	typedef union {		
 		FILETIME filetime;
@@ -67,10 +67,10 @@ static int gettimeofday(struct timeval* tv)
 	} NANOTIME;
 	NANOTIME nt = { 0 };
 	::GetSystemTimeAsFileTime(&nt.filetime);
-	tv->tv_usec = (long)((nt.nanotime / 10ULL) % 1000000ULL);
-	tv->tv_sec = (long)((nt.nanotime - 116444736000000000ULL) / 10000000ULL);
+	ptv->tv_usec = (long)((nt.nanotime / 10ULL) % 1000000ULL);
+	ptv->tv_sec = (long)((nt.nanotime - 116444736000000000ULL) / 10000000ULL);
 
-	return (0);
+	return ptv;
 }
 #endif // !gettimeofday
 
@@ -91,10 +91,11 @@ static __inline void DebugPrint(int fd, const void * data, unsigned long size)
 static __inline void DebugPrint(int fd, const _TCHAR * data, struct timeval * tv)
 {
 	//printf("fd=%d\n\n", fd);
-	DebugPrint(fd, TToA(data).c_str(), TToA(data).length());
+	//DebugPrint(fd, TToA(data).c_str(), TToA(data).length());
 	std::string strLog = TToA(tstring(_T("[")) + STRING_FROM_TIME(tv) + _T("] ") + data + _T("\n"));
 	//printf("%s\n", strLog.c_str());
 	DebugPrint(fd, strLog.c_str(), strLog.length());
+	DebugPrint(fileno(stdout), strLog.c_str(), strLog.length());
 }
 
 //记录日志接口

@@ -25,12 +25,13 @@ static __inline tstring DATE_FROM_TIME(time_t tv_sec) { _TCHAR tzV[128] = { 0 };
 
 int _tmain(int argc, _TCHAR* argv[])
 {
+	int n = CONTEXT_ALL;
 	struct timeval tv = { 0 };
 	gettimeofday(&tv);
 	DATE_FROM_TIME(0);
 	DATE_FROM_TIME(tv.tv_sec);
 	_TCHAR tszModuleName[MAX_PATH] = _T("hookproc.dll");
-	_TCHAR tszProcessName[MAX_PATH] = _T("D:\\Tencent\\WeChat\\wechat.exe");
+	_TCHAR tszProcessName[MAX_PATH] = _T("D:\\DevelopmentEnvironment\\Softwares\\Tencent\\WeChat\\wechat.exe");
 	switch (argc)
 	{
 	case 1:
@@ -53,19 +54,31 @@ int _tmain(int argc, _TCHAR* argv[])
 		break;
 	}
 	tstring tsDllPath = GetProgramPath() + tszModuleName;
-	BOOL isInject = InjectDllToRemoteProcess(tsDllPath.c_str(), NULL, tszProcessName);
+	
+	PROCESS_INFORMATION pi = { 0 };
+	StartupProgram(tszProcessName, _T(""), NULL, &pi);
+	InjectDll(pi.dwProcessId, pi.dwThreadId, tsDllPath.c_str());
 
-	if (!isInject)
+	//BOOL isInject = InjectDllToRemoteProcess(tsDllPath.c_str(), NULL, tszProcessName);
+
+	//if (!isInject)
 	{
 		//注入远程进程失败
-		::MessageBox(NULL, _T("Remote inject error"), _T("error"), MB_OK);
+		//::MessageBox(NULL, _T("Remote inject error"), _T("error"), MB_OK);
 	}
 
 	while (1)
 	{
-		Sleep(3000);
+		Sleep(1000);
+		
 		_tprintf(_T("Handling...\n"));
+
+		Sleep(5000);
+		
+		break;
 	}
 
+	_tprintf(_T("Exiting...\n"));
+	
 	return 0;
 }
